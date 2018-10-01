@@ -1,4 +1,5 @@
 import random
+import time
 
 
 class Graph(object):
@@ -14,11 +15,12 @@ class Graph(object):
 
 
 class ACO(object):
-    def __init__(self, ant_count: int, generations: int, alpha: float, beta: float, rho: float, q: int,
+    def __init__(self, ant_count: int, time_limit: int, generations: int, alpha: float, beta: float, rho: float, q: int,
                  strategy: int):
         """
         :param ant_count:
-        :param generations:
+        :param time_limit: time limit in seconds, no limit if =0
+        :param generations: number of iterations, no limit if =0
         :param alpha: relative importance of pheromone
         :param beta: relative importance of heuristic information
         :param rho: pheromone residual coefficient
@@ -30,6 +32,7 @@ class ACO(object):
         self.beta = beta
         self.alpha = alpha
         self.ant_count = ant_count
+        self.time_limit = time_limit
         self.generations = generations
         self.update_strategy = strategy
 
@@ -47,7 +50,12 @@ class ACO(object):
         """
         best_cost = float('inf')
         best_solution = []
-        for gen in range(self.generations):
+        elapsed_time = 0
+        gen = 0
+        start_time = time.time()
+        done = False
+
+        while not done:
             # noinspection PyUnusedLocal
             ants = [_Ant(self, graph) for i in range(self.ant_count)]
             for ant in ants:
@@ -61,7 +69,13 @@ class ACO(object):
                 ant._update_pheromone_delta()
             self._update_pheromone(graph, ants)
             # print('generation #{}, best cost: {}, path: {}'.format(gen, best_cost, best_solution))
-        return best_solution, best_cost
+
+            gen +=1
+            elapsed_time = time.time() - start_time
+            if(gen == self.generations and self.generations > 0) or (elapsed_time >= self.time_limit and self.time_limit > 0):
+                done = True
+
+        return best_solution, best_cost, elapsed_time
 
 
 class _Ant(object):
