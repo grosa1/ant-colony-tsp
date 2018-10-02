@@ -48,7 +48,7 @@ def main():
         for j in range(rank):
             row.append(distance(cities[i], cities[j]))
         cost_matrix.append(row)
-    aco = ACO(ant_count=10, time_limit=60, generations=0, alpha=1.0, beta=10.0, rho=0.5, q=10, strategy=2)
+    aco = ACO(ant_count=500, time_limit=1800, generations=0, alpha=5.0, beta=5.0, rho=0.2, q=5, strategy=1)
     graph = Graph(cost_matrix, rank)
     path, cost, time = aco.solve(graph)
     print("Elapsed time was {0:.1f} seconds.".format(time))
